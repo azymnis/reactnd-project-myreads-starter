@@ -7,7 +7,7 @@ const Book = ({imageUrl, title, authors, shelf, onChangeShelf}) => (
       {imageUrl && (<div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url("${imageUrl}")` }}></div>) }
       <div className="book-shelf-changer">
         <select value={shelf || "none"} onChange={(event) => onChangeShelf(event.target.value)}>
-          <option value="none" disabled>Move to...</option>
+          <option value="move" disabled>Move to...</option>
           <option value="currentlyReading">Currently Reading</option>
           <option value="wantToRead">Want to Read</option>
           <option value="read">Read</option>
@@ -24,7 +24,7 @@ Book.propTypes = {
   imageUrl: PropTypes.string,
   title: PropTypes.string.isRequired,
   authors: PropTypes.array,
-  shelf: PropTypes.oneOf(["wantToRead", "currentlyReading", "read"]),
+  shelf: PropTypes.oneOf(["wantToRead", "currentlyReading", "read", "none"]),
   onChangeShelf: PropTypes.func.isRequired
 }
 

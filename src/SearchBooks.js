@@ -21,23 +21,28 @@ class SearchBooks extends Component {
   }
 
   updateQuery = (query) => {
-    this.setState({ query: query.trim() })
+    const trimmedQuery = query.trim()
     if (query !== '') {
       BooksAPI.search(query, 100).then(data => {
         if (data.error) {
-          this.setState({results: []})
+          this.setState({results: [], query: trimmedQuery})
         } else {
-          this.setState({results: data})
+          this.setState({results: data, query: trimmedQuery})
         }
       })
     } else {
-      this.setState({results: []})
+      this.setState({results: [], query: trimmedQuery})
     }
   }
 
   moveBook = (bookId, shelf) => {
-    console.log(`moving book ${bookId} to shelf ${shelf}`)
-    BooksAPI.update({id: bookId}, shelf).then(res => console.log(res))
+    BooksAPI.update({id: bookId}, shelf)
+    this.setState(state => {
+        const shelves = state.shelves
+        shelves[bookId] = shelf
+        return {shelves}
+      }
+    )
   }
 
   render() {
