@@ -1,21 +1,25 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
 import { search } from './BooksAPI'
+import Book from './Book'
 
 class SearchBooks extends Component {
   state = {
-    query: ''
+    query: '',
+    results: []
   }
 
   updateQuery = (query) => {
     this.setState({ query: query.trim() })
     if (query !== '') {
-      search(query, 100).then(data => console.log(data))
+      search(query, 100).then(data => this.setState({ results: data}))
+    } else {
+      this.setState({results: []})
     }
   }
 
   render() {
-    const { query } = this.state
+    const { query, results } = this.state
 
     return (
       <div className="search-books">
@@ -40,7 +44,17 @@ class SearchBooks extends Component {
           </div>
         </div>
         <div className="search-books-results">
-          <ol className="books-grid"></ol>
+          <ol className="books-grid">
+            {results.map( result =>
+              (<li key={result.id}>
+                <Book
+                  imageUrl={result.imageLinks.thumbnail}
+                  authors={result.authors}
+                  title={result.title}
+                />
+               </li>)
+            )}
+          </ol>
         </div>
       </div>
     )
