@@ -1,25 +1,47 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { search } from './BooksAPI'
+import * as BooksAPI from './BooksAPI'
 import Book from './Book'
 
 class SearchBooks extends Component {
   state = {
     query: '',
-    results: []
+    results: [],
+    shelves: {}
+  }
+
+  componentDidMount() {
+    BooksAPI.getAll().then(existingBooks => {
+      const shelves = {}
+      existingBooks.forEach( book =>
+        shelves[book.id] = book.shelf
+      )
+      this.setState({ shelves })
+    })
   }
 
   updateQuery = (query) => {
     this.setState({ query: query.trim() })
     if (query !== '') {
-      search(query, 100).then(data => this.setState({ results: data}))
+      BooksAPI.search(query, 100).then(data => {
+        if (data.error) {
+          this.setState({results: []})
+        } else {
+          this.setState({results: data})
+        }
+      })
     } else {
       this.setState({results: []})
     }
   }
 
+  moveBook = (bookId, shelf) => {
+    console.log(`moving book ${bookId} to shelf ${shelf}`)
+    BooksAPI.update({id: bookId}, shelf).then(res => console.log(res))
+  }
+
   render() {
-    const { query, results } = this.state
+    const { query, results, shelves } = this.state
 
     return (
       <div className="search-books">
@@ -48,9 +70,11 @@ class SearchBooks extends Component {
             {results.map( result =>
               (<li key={result.id}>
                 <Book
-                  imageUrl={result.imageLinks.thumbnail}
+                  imageUrl={result.imageLinks ? result.imageLinks.thumbnail : undefined}
                   authors={result.authors}
                   title={result.title}
+                  shelf={shelves[result.id]}
+                  onChangeShelf={(shelf) => this.moveBook(result.id, shelf)}
                 />
                </li>)
             )}
