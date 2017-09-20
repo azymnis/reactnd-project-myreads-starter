@@ -5,15 +5,21 @@ import Book from './Book'
 
 class ListBooks extends Component {
   state = {
-    shelves: {}
+    shelves: {} // Contains a key per shelf that points to an array of book objects
   }
 
+  /**
+   * An array of book shelf names with human readable descriptions
+   */
   shelfDescriptions = [
     {key: "currentlyReading", description: "Currently Reading"},
     {key: "wantToRead", description: "Want to Read"},
     {key: "read", description: "Read"}
   ]
 
+  /**
+   * Do an API call to get the state of all shelves in the backend
+   */
   componentDidMount() {
     BooksAPI.getAll().then(existingBooks => {
       const shelves = {}
@@ -27,6 +33,9 @@ class ListBooks extends Component {
     })
   }
 
+  /**
+   * Helper method to generate a single shelf based on state.shelves
+   */
   generateBookShelf = (shelf, shelfName) => {
     const books = this.state.shelves[shelf]
     return (<div className="bookshelf" key={shelf}>
@@ -49,7 +58,12 @@ class ListBooks extends Component {
     </div>)
   }
 
+  /**
+   * Make an API call to move currentBook to newShelf,
+   * and then update the internal state of shelves.
+   */
   moveBook = (currentBook, currentShelf, newShelf) => {
+    BooksAPI.update({id: currentBook.id}, newShelf)
     this.setState( prevState => {
       const newState = { shelves: {} }
       this.shelfDescriptions.forEach( desc => {

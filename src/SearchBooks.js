@@ -5,11 +5,14 @@ import Book from './Book'
 
 class SearchBooks extends Component {
   state = {
-    query: '',
-    results: [],
-    shelves: {}
+    query: '', // Search form query text
+    results: [], // Search results
+    shelves: {} // Mapping of bookId to shelf name
   }
 
+  /**
+   * Populate the state of shelves by making an API call
+   */
   componentDidMount() {
     BooksAPI.getAll().then(existingBooks => {
       const shelves = {}
@@ -20,6 +23,9 @@ class SearchBooks extends Component {
     })
   }
 
+  /**
+   * Update results by making an API call
+   */
   updateQuery = (query) => {
     const trimmedQuery = query.trim()
     if (query !== '') {
@@ -35,6 +41,9 @@ class SearchBooks extends Component {
     }
   }
 
+  /**
+   * Make an API call to modify a book's shelf and then update local state
+   */
   moveBook = (bookId, shelf) => {
     BooksAPI.update({id: bookId}, shelf)
     this.setState(state => {
