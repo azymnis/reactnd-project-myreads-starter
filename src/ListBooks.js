@@ -8,13 +8,16 @@ class ListBooks extends Component {
     shelves: {}
   }
 
+  shelfDescriptions = [
+    {key: "currentlyReading", description: "Currently Reading"},
+    {key: "wantToRead", description: "Want to Read"},
+    {key: "read", description: "Read"}
+  ]
+
   componentDidMount() {
     BooksAPI.getAll().then(existingBooks => {
-      const shelves = {
-        wantToRead: [],
-        currentlyReading: [],
-        read: []
-      }
+      const shelves = {}
+      this.shelfDescriptions.forEach(desc => shelves[desc.key] = [])
       existingBooks.forEach( book => {
         if (book.shelf in shelves) {
           shelves[book.shelf].push(book)
@@ -26,7 +29,7 @@ class ListBooks extends Component {
 
   generateBookShelf = (shelf, shelfName) => {
     const books = this.state.shelves[shelf]
-    return (<div className="bookshelf">
+    return (<div className="bookshelf" key={shelf}>
       <h2 className="bookshelf-title">{shelfName}</h2>
       <div className="bookshelf-books">
         <ol className="books-grid">
@@ -37,13 +40,32 @@ class ListBooks extends Component {
                 authors={book.authors}
                 title={book.title}
                 shelf={shelf}
-                onChangeShelf={(shelf) => console.log(shelf)}
+                onChangeShelf={(newShelf) => this.moveBook(book, shelf, newShelf)}
               />
              </li>)
           )}
         </ol>
       </div>
     </div>)
+  }
+
+  moveBook = (currentBook, currentShelf, newShelf) => {
+    this.setState( prevState => {
+      const newState = { shelves: {} }
+      this.shelfDescriptions.forEach( desc => {
+        const prevShelf = prevState.shelves[desc.key]
+        if (desc.key === currentShelf) {
+          newState.shelves[desc.key] = prevShelf.filter ( book =>
+            book.id !== currentBook.id
+          )
+        } else if (desc.key === newShelf) {
+          newState.shelves[desc.key] = prevShelf.concat([currentBook])
+        } else {
+          newState.shelves[desc.key] = prevShelf
+        }
+      })
+      return newState
+    })
   }
 
   render() {
@@ -54,9 +76,9 @@ class ListBooks extends Component {
         </div>
         <div className="list-books-content">
           <div>
-            {this.generateBookShelf("currentlyReading", "Currently Reading")}
-            {this.generateBookShelf("wantToRead", "Want to Read")}
-            {this.generateBookShelf("read", "Read")}
+            {this.shelfDescriptions.map(desc =>
+              this.generateBookShelf(desc.key, desc.description)
+            )}
           </div>
         </div>
         <div className="open-search">
