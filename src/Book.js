@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 const Book = ({imageUrl, title, authors, shelf, onChangeShelf}) => (
   <div className="book">
     <div className="book-top">
-      {imageUrl && (<div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url("${imageUrl}")` }}></div>) }
+      {imageUrl && (<div className="book-cover" style={{backgroundImage: `url("${imageUrl}")`}}></div>) }
       <div className="book-shelf-changer">
         <select value={shelf || "none"} onChange={(event) => onChangeShelf(event.target.value)}>
           <option value="move" disabled>Move to...</option>
@@ -16,7 +16,7 @@ const Book = ({imageUrl, title, authors, shelf, onChangeShelf}) => (
       </div>
     </div>
     <div className="book-title">{title}</div>
-    {authors && (<div className="book-authors">{authors.join(", ")}</div>)}
+    <div className="book-authors">{authors ? authors.join(", "): ""}</div>
   </div>
 )
 
